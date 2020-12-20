@@ -1,6 +1,6 @@
 Rerun these tests again as they are of higher complexity then nest solution possible
 
-array -> TwoSum (O(n^2))
-array -> MaximumSubArray (O(n))
-array -> MoveZeroes (O(n^2))
-array -> RotateArray (O(n^2))
+leetcode -> TwoSum (O(n^2))
+leetcode -> MaximumSubArray (O(n))
+leetcode -> MoveZeroes (O(n^2))
+leetcode -> RotateArray (O(n^2))

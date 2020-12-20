@@ -1,6 +1,4 @@
-package ds
-
-import javax.xml.soap.Node
+package datastructures
 
 fun main(){
     println("BST")
@@ -24,6 +22,7 @@ class BST(value: Int){
         var right : Node? = null
         var value : Int = value
 
+//        Returns a JSON
         override fun toString(): String {
             return "{\"left\":$left,\"value\":\"$value\",\"right\":$right}"
         }
