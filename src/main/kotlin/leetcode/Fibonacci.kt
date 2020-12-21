@@ -1,0 +1,62 @@
+package leetcode
+
+fun main() {
+    println("Fibonacci\n")
+    print("${fibonacciIterative(43)} ")
+    print("${fibonacciReccursive(43)} ")
+    print("${fibonacciWitMemoization(43)} ")
+//    for(i in 0..20){
+//        print("${fibonacciIterative(i)} ")
+//    }
+//    println()
+//    for(i in 0..20){
+//        print("${fibonacciReccursive(i)} ")
+//    }
+//    println()
+//    for(i in 0..20){
+//        print("${fibonacciWitMemoization(i)} ")
+//    }
+}
+
+fun fibonacciIterative(value: Int): Int {
+    return when(value) {
+        0 -> 0
+        1,2 -> 1
+        else -> {
+            var prev = 1
+            var next = 1
+            var count = value - 2
+            while (count > 0) {
+                next += prev.also { prev = next }
+                count--
+            }
+            next
+        }
+    }
+
+}
+
+fun fibonacciReccursive(value: Int):Int {
+    return when(value){
+        0 -> 0
+        1,2 -> 1
+        else->{
+            fibonacciReccursive(value-1) + fibonacciReccursive(value-2)
+        }
+    }
+}
+
+private fun calculateFibonnaciSequesnce(value: Int, fibArrayList:ArrayList<Int>):Int {
+    return if (value < fibArrayList.size) fibArrayList[value]
+    else
+        (calculateFibonnaciSequesnce(value - 1, fibArrayList) + calculateFibonnaciSequesnce(value - 2, fibArrayList)).let {
+            fibArrayList.add(it)
+            it
+        }
+}
+
+
+fun fibonacciWitMemoization(value: Int):Int{
+    var fibArrayList = arrayListOf(0, 1, 1)
+    return calculateFibonnaciSequesnce(value, fibArrayList)
+}

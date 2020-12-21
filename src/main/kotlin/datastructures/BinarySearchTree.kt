@@ -1,5 +1,7 @@
 package datastructures
 
+import com.sun.org.apache.xerces.internal.dom.ParentNode
+
 fun main(){
     println("BST")
     var tree = BST(99)
@@ -12,10 +14,20 @@ fun main(){
     var node = tree.search(110)
     println(node.toString())
     println("TREE")
+    tree.remove(30)
     println(tree.root.toString())
 }
 
 class BST(value: Int){
+
+    data class NodeWithParent(var node:Node, var parentNode:Node?, var isLeftChild:Boolean?){
+        fun setNodesChild( node: Node?) {
+            when (isLeftChild) {
+                true -> parentNode?.left = node
+                else -> parentNode?.right = node
+            }
+        }
+    }
 
     class Node(value: Int){
         var left : Node? = null
@@ -49,9 +61,11 @@ class BST(value: Int){
         }
     }
 
-    fun search(value: Int): Node? {
+    fun search(value: Int): NodeWithParent? {
         var node:Node? = null
         var currentNode = root
+        var parentNode : Node? = null
+        var isLeftChild:Boolean? = null
         while(true){
             if(value == currentNode.value){
                 node = currentNode
@@ -62,7 +76,9 @@ class BST(value: Int){
                     break
                 }
                 currentNode.left?.let {
+                    parentNode = currentNode
                     currentNode =  it
+                    isLeftChild = true
                 }
             }
             else{
@@ -71,11 +87,51 @@ class BST(value: Int){
                     break
                 }
                 currentNode.right?.let {
+                    parentNode = currentNode
                     currentNode =  it
+                    isLeftChild = false
                 }
             }
         }
-        return node
+        node?.let {
+            return NodeWithParent(node, parentNode, isLeftChild)
+        }
+        return null
     }
+
+    fun remove(value: Int) : BST?{
+        search(value)?.let{
+            if(null == it.parentNode){
+                this.root = it.node
+            }else if(it.node.left != null && it.node.right != null){
+                var prevNode:Node? = null
+                var currentNode: Node? = it.node.right
+
+                while(currentNode!=null){
+                    if(currentNode.left == null){
+                        it.node?.value = currentNode.value
+                        if(prevNode == null){
+                            it.node.right = currentNode?.right
+                        }
+                        prevNode?.let{
+                            prevNode?.left = currentNode?.right
+                        }
+                    }
+                    prevNode = currentNode
+                    currentNode = currentNode.left
+                }
+            }else if(it.node.left == null){
+                it.setNodesChild(it.node.right)
+            }else if(it.node.right == null){
+                it.setNodesChild(it.node.left)
+            }else{
+                it.setNodesChild( null)
+            }
+            return this
+        }
+        return null
+    }
+
+
 
 }
