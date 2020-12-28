@@ -17,5 +17,9 @@ fun main() {
     println()
     linkedList.add(1,5)
     linkedList.forEach { print("$it ") }
+    println()
+    var arr = arrayOf(45,12,0,-3,-1,99)
+    arr.sort()
+    arr.forEach { print("$it ") }
 
 }

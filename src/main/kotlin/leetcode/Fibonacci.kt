@@ -2,20 +2,17 @@ package leetcode
 
 fun main() {
     println("Fibonacci\n")
-    print("${fibonacciIterative(43)} ")
-    print("${fibonacciReccursive(43)} ")
-    print("${fibonacciWitMemoization(43)} ")
-//    for(i in 0..20){
-//        print("${fibonacciIterative(i)} ")
-//    }
-//    println()
-//    for(i in 0..20){
-//        print("${fibonacciReccursive(i)} ")
-//    }
-//    println()
-//    for(i in 0..20){
-//        print("${fibonacciWitMemoization(i)} ")
-//    }
+    for(i in 0..43){
+        print("${fibonacciIterative(i)} ")
+    }
+    println()
+    for(i in 0..43){
+        print("${fibonacciReccursive(i)} ")
+    }
+    println()
+    for(i in 0..43){
+        print("${fibonacciWitMemoization(i)} ")
+    }
 }
 
 fun fibonacciIterative(value: Int): Int {
