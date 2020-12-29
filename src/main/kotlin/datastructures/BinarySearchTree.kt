@@ -1,7 +1,5 @@
 package datastructures
 
-import com.sun.org.apache.xerces.internal.dom.ParentNode
-
 fun main() {
     println("BST")
     var tree = BST(99)
@@ -30,9 +28,9 @@ fun main() {
     println("For tree ${treeN.root}")
     println("Inorder")
     treeN.dfsInOrder().forEach { print("$it ") }
-    println("Preorder")
+    println("\nPreorder")
     treeN.dfsPreOrder().forEach { print("$it ") }
-    println("Postorder")
+    println("\nPostorder")
     treeN.dfsPostOrder().forEach { print("$it ") }
 }
 
@@ -167,55 +165,56 @@ class BST(value: Int) {
         return list
     }
 
-    fun dfsInOrder() : ArrayList<Int>{
-        return ArrayList<Int>().let{
-            traverseInOrder(root, it)
-            it
+    fun dfsInOrder(): ArrayList<Int> {
+        return ArrayList<Int>().let { traversedList ->
+            fun traverseInOrder(currentNode: Node) {
+                currentNode.left?.let {
+                    traverseInOrder(it)
+                }
+                traversedList.add(currentNode.value)
+                currentNode.right?.let {
+                    traverseInOrder(it)
+                }
+                return
+            }
+            traverseInOrder(root)
+            traversedList
         }
     }
 
-    private fun traverseInOrder(currentNode:Node, traversedList:ArrayList<Int>){
-        currentNode.left?.let{
-            traverseInOrder(it, traversedList)
+    fun dfsPostOrder(): ArrayList<Int> {
+        return ArrayList<Int>().let { traversedList->
+             fun traversePostOrder(currentNode: Node) {
+                currentNode.left?.let {
+                    traversePostOrder(it)
+                }
+                currentNode.right?.let {
+                    traversePostOrder(it)
+                }
+                traversedList.add(currentNode.value)
+                return
+            }
+            traversePostOrder(root)
+            traversedList
         }
-        traversedList.add(currentNode.value)
-        currentNode.right?.let{
-            traverseInOrder(it, traversedList)
-        }
-        return
     }
 
-    fun dfsPostOrder(): ArrayList<Int>{
-        return ArrayList<Int>().let{
-            traversePostOrder(root, it)
-            it
+    fun dfsPreOrder(): ArrayList<Int> {
+        return ArrayList<Int>().let {traversedList->
+            fun traversePreOrder(currentNode: Node,) {
+                traversedList.add(currentNode.value)
+                currentNode.left?.let {
+                    traversePreOrder(it)
+                }
+                currentNode.right?.let {
+                    traversePreOrder(it)
+                }
+                return
+            }
+            traversePreOrder(root)
+            traversedList
         }
     }
-    private fun traversePostOrder(currentNode:Node, traversedList:ArrayList<Int>){
-        currentNode.left?.let{
-            traversePostOrder(it, traversedList)
-        }
-        currentNode.right?.let{
-            traversePostOrder(it, traversedList)
-        }
-        traversedList.add(currentNode.value)
-        return
-    }
-    fun dfsPreOrder(): ArrayList<Int>{
-        return ArrayList<Int>().let{
-            traversePreOrder(root, it)
-            it
-        }
-    }
-    private fun traversePreOrder(currentNode:Node, traversedList:ArrayList<Int>){
-        traversedList.add(currentNode.value)
-        currentNode.left?.let{
-            traversePreOrder(it, traversedList)
-        }
-        currentNode.right?.let{
-            traversePreOrder(it, traversedList)
-        }
-        return
-    }
+
 }
 

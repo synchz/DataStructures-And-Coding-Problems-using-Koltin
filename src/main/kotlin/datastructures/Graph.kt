@@ -20,9 +20,9 @@ fun main() {
     myGraph.addEdge('6', '5')
     myGraph.printGraph()
     println("BFS of graph")
-    myGraph.bfs('2').forEach { print("$it ") }
+    myGraph.performBfs('2').forEach { print("$it ") }
     println("DFS of graph")
-    myGraph.dfs('2').forEach { print("$it ") }
+    myGraph.performDfs('2').forEach { print("$it ") }
 
     var cityGraph = AdjacentListGraphWithWeight<Int>()
     cityGraph.apply {
@@ -46,17 +46,11 @@ fun main() {
         it
     }.let { graph ->
         println("\nDjKistra")
-        graph.shortestPathDjkistra(1)
-        graph.calculatedShortestPathDjKistra.forEach { (key, value) ->  println("node: $key, weight: $value")}
-        println("Shortest path")
-        graph.printShortestPathToNodeDjkistra(1, 6)?.forEach { print("$it ->") }
+        graph.shortestPathDjkistra(1).invoke(1, 6)?.forEach { print("$it ->") }
         graph
     }.let { graph ->
         println("\nBellmanFord")
-        graph.shortestPathBellmanFord(1)
-        graph.calculatedShortestPathBellmanFord.forEach { (key, value) ->  println("node: $key, weight: $value")}
-        println("Shortest path")
-        graph.printShortestPathToNodeBellmanFord(1, 6)?.forEach { print("$it ->") }
+        graph.shortestPathBellmanFord(1).invoke(1, 6)?.forEach { print("$it ->") }
         graph
     }
 }
@@ -79,37 +73,46 @@ class AdjacentListGraph<T> {
         adjacencyList[node1] = (adjacencyList[node1] ?: ArrayList()).apply { add(node2) }
     }
 
-    private var visitedBFSNodeSet: LinkedHashSet<T> = LinkedHashSet()
-    fun bfs(node: T): Array<T> {
-        var queueList = ArrayList<T>()
-        queueList.add(node)
-        visitedBFSNodeSet.add(node)
-        while (queueList.size != 0) {
-            adjacencyList[queueList.removeFirst()]?.let {
-                for (value in it) {
-                    if (!visitedBFSNodeSet.contains(value)) {
-                        queueList.add(value)
-                        visitedBFSNodeSet.add(value)
+    fun performBfs(node: T): Array<T> {
+        return LinkedHashSet<T>().let { visitedBFSNodeSet ->
+            fun bfs(node: T) {
+                var queueList = ArrayList<T>()
+                queueList.add(node)
+                visitedBFSNodeSet.add(node)
+                while (queueList.size != 0) {
+                    adjacencyList[queueList.removeFirst()]?.let {
+                        for (value in it) {
+                            if (!visitedBFSNodeSet.contains(value)) {
+                                queueList.add(value)
+                                visitedBFSNodeSet.add(value)
+                            }
+                        }
                     }
                 }
             }
+            bfs(node)
+            visitedBFSNodeSet.toArray() as Array<T>
         }
-        return visitedBFSNodeSet.toArray() as Array<T>
     }
 
-    private var visitedDFSNodeSet: LinkedHashSet<T> = LinkedHashSet()
-    fun dfs(node: T): Array<T> {
-        visitedDFSNodeSet.add(node)
-        adjacencyList[node]?.let {
-            for (value in it) {
-                if (!visitedDFSNodeSet.contains(value)) {
+    fun performDfs(node: T): Array<T> {
+        return LinkedHashSet<T>().let { visitedDFSNodeSet ->
+            fun dfs(node: T) {
+                visitedDFSNodeSet.add(node)
+                adjacencyList[node]?.let {
+                    for (value in it) {
+                        if (!visitedDFSNodeSet.contains(value)) {
 //                    Write logic here if want to track backtracking
-                    visitedDFSNodeSet.add(value)
-                    dfs(value)
+                            visitedDFSNodeSet.add(value)
+                            dfs(value)
+                        }
+                    }
                 }
+                return
             }
+            dfs(node)
+            visitedDFSNodeSet.toArray() as Array<T>
         }
-        return visitedDFSNodeSet.toArray() as Array<T>
     }
 
     fun printGraph() {
@@ -138,125 +141,130 @@ class AdjacentListGraphWithWeight<T> {
         adjacencyList[node1] = (adjacencyList[node1] ?: ArrayList()).apply { add(Pair(node2, weight)) }
     }
 
-    private var visitedBFSNodeSet: LinkedHashSet<T> = LinkedHashSet()
     fun performBfs(node: T): Array<T> {
-        visitedBFSNodeSet = LinkedHashSet()
-        return bfs(node)
-    }
-
-    private fun bfs(node: T): Array<T> {
-        var queueList = ArrayList<T>()
-        queueList.add(node)
-        visitedBFSNodeSet.add(node)
-        while (queueList.size != 0) {
-            adjacencyList[queueList.removeFirst()]?.let {
-                for (value in it) {
-                    if (!visitedBFSNodeSet.contains(value)) {
-                        queueList.add(value.first)
-                        visitedBFSNodeSet.add(value.first)
-                    }
-                }
-            }
-        }
-        return visitedBFSNodeSet.toArray() as Array<T>
-    }
-
-    private var visitedDFSNodeSet: LinkedHashSet<T> = LinkedHashSet()
-    fun performDfs(node: T): Array<T> {
-        visitedDFSNodeSet = LinkedHashSet()
-        return dfs(node)
-    }
-
-    private fun dfs(node: T): Array<T> {
-        visitedDFSNodeSet.add(node)
-        adjacencyList[node]?.let {
-            for (value in it) {
-                if (!visitedDFSNodeSet.contains(value)) {
-//                    Write logic here if want to track backtracking
-                    visitedDFSNodeSet.add(value.first)
-                    dfs(value.first)
-                }
-            }
-        }
-        return visitedDFSNodeSet.toArray() as Array<T>
-    }
-
-    private var visitedDjkistraNodeSet: HashSet<T> = LinkedHashSet()
-    var calculatedShortestPathDjKistra: HashMap<T, Pair<T, Int>> = HashMap()
-    fun shortestPathDjkistra(startNode: T){
-        visitedDjkistraNodeSet = LinkedHashSet()
-        calculatedShortestPathDjKistra = HashMap()
-        calculatedShortestPathDjKistra[startNode] = Pair(startNode, 0)
-        findShortestPathUsingDjkistra(startNode)
-    }
-    private fun findShortestPathUsingDjkistra(startNode: T) {
-        visitedDjkistraNodeSet.add(startNode)
-        adjacencyList[startNode]?.let {
-            for (nodeSet in it) {
-                if (!visitedDjkistraNodeSet.contains(nodeSet.first)&&(!calculatedShortestPathDjKistra.containsKey(nodeSet.first) ||
-                    calculatedShortestPathDjKistra[nodeSet.first]!!.second > (nodeSet.second + (calculatedShortestPathDjKistra[startNode]?.second?:0))
-                ))
-                    calculatedShortestPathDjKistra[nodeSet.first] = Pair(startNode, nodeSet.second + (calculatedShortestPathDjKistra[startNode]?.second?:0))
-            }
-        }
-        var leastNode: T = findNodeWithLeastWeight() ?: return
-        findShortestPathUsingDjkistra(leastNode)
-    }
-
-    private fun findNodeWithLeastWeight(): T? {
-        var min:Int? = null
-        var minNode:T? = null
-        calculatedShortestPathDjKistra.forEach{ (key, value) ->
-            if(!visitedDjkistraNodeSet.contains(key) &&(null== min || min!! > value.second)) {
-                min = value.second
-                minNode = key
-            }
-        }
-        return minNode
-    }
-
-    fun printShortestPathToNodeDjkistra(startNode: T, endNode:T): ArrayList<T>? {
-        var pathArray = ArrayList<T>()
-        var currentNode = endNode
-        pathArray.add(0,currentNode)
-        while(currentNode!=startNode){
-            if(!calculatedShortestPathDjKistra.containsKey(currentNode)) return  null
-            currentNode = calculatedShortestPathDjKistra[currentNode]!!.first
-            pathArray.add(0,currentNode)
-        }
-        return pathArray
-    }
-
-    var calculatedShortestPathBellmanFord: HashMap<T, Pair<T, Int>> = HashMap()
-    fun shortestPathBellmanFord(startNode: T){
-        calculatedShortestPathBellmanFord = HashMap()
-        calculatedShortestPathBellmanFord[startNode] = Pair(startNode, 0)
-        var count = adjacencyList.size
-        while (count-- > 0){
-            adjacencyList.forEach { (key, value) ->
-                if(calculatedShortestPathBellmanFord.containsKey(key)) {
-                    var currentNodeWeight = calculatedShortestPathBellmanFord[key]!!.second
-                    value.forEach { (node, weight) ->
-                        if(!calculatedShortestPathBellmanFord.containsKey(node) ||
-                            (currentNodeWeight + weight) < calculatedShortestPathBellmanFord[node]!!.second){
-                            calculatedShortestPathBellmanFord[node] = Pair(key, currentNodeWeight + weight)
+        return LinkedHashSet<T>().let { visitedBFSNodeSet ->
+            fun bfs(node: T) {
+                var queueList = ArrayList<T>()
+                queueList.add(node)
+                visitedBFSNodeSet.add(node)
+                while (queueList.size != 0) {
+                    adjacencyList[queueList.removeFirst()]?.let {
+                        for (value in it) {
+                            if (!visitedBFSNodeSet.contains(value)) {
+                                queueList.add(value.first)
+                                visitedBFSNodeSet.add(value.first)
+                            }
                         }
                     }
-
                 }
             }
+            bfs(node)
+            visitedBFSNodeSet.toArray() as Array<T>
         }
     }
-    fun printShortestPathToNodeBellmanFord(startNode: T, endNode:T): ArrayList<T>? {
+
+    fun performDfs(node: T): Array<T> {
+        return LinkedHashSet<T>().let { visitedDFSNodeSet ->
+            fun dfs(node: T) {
+                visitedDFSNodeSet.add(node)
+                adjacencyList[node]?.let {
+                    for (value in it) {
+                        if (!visitedDFSNodeSet.contains(value)) {
+//                    Write logic here if want to track backtracking
+                            visitedDFSNodeSet.add(value.first)
+                            dfs(value.first)
+                        }
+                    }
+                }
+            }
+            visitedDFSNodeSet.toArray() as Array<T>
+        }
+    }
+
+    private fun printShortestPathToNode(
+        startNode: T,
+        endNode: T,
+        calculateShortestPath: HashMap<T, Pair<T, Int>>
+    ): ArrayList<T>? {
         var pathArray = ArrayList<T>()
         var currentNode = endNode
-        pathArray.add(0,currentNode)
-        while(currentNode!=startNode){
-            if(!calculatedShortestPathBellmanFord.containsKey(currentNode)) return  null
-            currentNode = calculatedShortestPathBellmanFord[currentNode]!!.first
-            pathArray.add(0,currentNode)
+        pathArray.add(0, currentNode)
+        while (currentNode != startNode) {
+            if (!calculateShortestPath.containsKey(currentNode)) return null
+            currentNode = calculateShortestPath[currentNode]!!.first
+            pathArray.add(0, currentNode)
         }
         return pathArray
+    }
+
+    fun shortestPathDjkistra(startNode: T): (T, T) -> ArrayList<T>? {
+        var visitedDjkistraNodeSet: HashSet<T> = LinkedHashSet()
+        var shortestPath = HashMap<T, Pair<T, Int>>().let { calculatedShortestPathDjKistra ->
+            calculatedShortestPathDjKistra[startNode] = Pair(startNode, 0)
+            fun findNodeWithLeastWeight(): T? {
+                var min: Int? = null
+                var minNode: T? = null
+                calculatedShortestPathDjKistra.forEach { (key, value) ->
+                    if (!visitedDjkistraNodeSet.contains(key) && (null == min || min!! > value.second)) {
+                        min = value.second
+                        minNode = key
+                    }
+                }
+                return minNode
+            }
+
+            fun findShortestPathUsingDjkistra(startNode: T) {
+                visitedDjkistraNodeSet.add(startNode)
+                adjacencyList[startNode]?.let {
+                    for (nodeSet in it) {
+                        if (!visitedDjkistraNodeSet.contains(nodeSet.first) && (!calculatedShortestPathDjKistra.containsKey(
+                                nodeSet.first
+                            ) ||
+                                    calculatedShortestPathDjKistra[nodeSet.first]!!.second > (nodeSet.second + (calculatedShortestPathDjKistra[startNode]?.second
+                                ?: 0))
+                                    )
+                        )
+                            calculatedShortestPathDjKistra[nodeSet.first] = Pair(
+                                startNode,
+                                nodeSet.second + (calculatedShortestPathDjKistra[startNode]?.second ?: 0)
+                            )
+                    }
+                }
+                var leastNode: T = findNodeWithLeastWeight() ?: return
+                findShortestPathUsingDjkistra(leastNode)
+            }
+            findShortestPathUsingDjkistra(startNode)
+            calculatedShortestPathDjKistra
+        }
+        return fun(startNode: T, endNode: T): ArrayList<T>? {
+            return printShortestPathToNode(startNode, endNode, shortestPath)
+        }
+
+    }
+
+    fun shortestPathBellmanFord(startNode: T): (T, T) -> ArrayList<T>? {
+        var shortestPath = HashMap<T, Pair<T, Int>>().let { calculatedShortestPathBellmanFord ->
+            calculatedShortestPathBellmanFord[startNode] = Pair(startNode, 0)
+            var count = adjacencyList.size
+            while (count-- > 0) {
+                adjacencyList.forEach { (key, value) ->
+                    if (calculatedShortestPathBellmanFord.containsKey(key)) {
+                        var currentNodeWeight = calculatedShortestPathBellmanFord[key]!!.second
+                        value.forEach { (node, weight) ->
+                            if (!calculatedShortestPathBellmanFord.containsKey(node) ||
+                                (currentNodeWeight + weight) < calculatedShortestPathBellmanFord[node]!!.second
+                            ) {
+                                calculatedShortestPathBellmanFord[node] = Pair(key, currentNodeWeight + weight)
+                            }
+                        }
+                    }
+                }
+            }
+            calculatedShortestPathBellmanFord
+        }
+        return fun(startNode: T, endNode: T): ArrayList<T>? {
+            return printShortestPathToNode(startNode, endNode, shortestPath)
+        }
     }
 
     fun printGraph() {
