@@ -43,17 +43,15 @@ fun fibonacciReccursive(value: Int):Int {
     }
 }
 
-private fun calculateFibonnaciSequesnce(value: Int, fibArrayList:ArrayList<Int>):Int {
-    return if (value < fibArrayList.size) fibArrayList[value]
-    else
-        (calculateFibonnaciSequesnce(value - 1, fibArrayList) + calculateFibonnaciSequesnce(value - 2, fibArrayList)).let {
-            fibArrayList.add(it)
-            it
-        }
-}
-
-
 fun fibonacciWitMemoization(value: Int):Int{
     var fibArrayList = arrayListOf(0, 1, 1)
-    return calculateFibonnaciSequesnce(value, fibArrayList)
+    fun calculateFibonnaciSequesnce(value: Int):Int {
+        return if (value < fibArrayList.size) fibArrayList[value]
+        else
+            (calculateFibonnaciSequesnce(value - 1) + calculateFibonnaciSequesnce(value - 2)).let {
+                fibArrayList.add(it)
+                it
+            }
+    }
+    return calculateFibonnaciSequesnce(value)
 }
