@@ -8,6 +8,8 @@ package leetcode
  *
  * */
 
+import kotlin.collections.*
+
 fun main(){
     println("First Case")
     threeSum(arrayOf(-1,0,1).toIntArray()).forEach { list->
@@ -20,18 +22,52 @@ fun main(){
         println()
     }
     println("Third Case")
-    threeSum(arrayOf(0,-1,0,1,0).toIntArray()).forEach { list->
+    threeSum(arrayOf(0,-1,-1,0,1,0,0).toIntArray()).forEach { list->
         list.forEach { print("$it ") }
         println()
     }
     println("Fourth Case")
-    threeSum(arrayOf(-1,0,1,2,-1,-4).toIntArray()).forEach { list->
+    threeSum(arrayOf(0, 0, 0, -1,-1,1,-4,2).toIntArray()).forEach { list->
         list.forEach { print("$it ") }
         println()
     }
 }
 
-fun threeSum(nums: IntArray): List<List<Int>> {
+fun threeSum(nums: IntArray): List<List<Int>>{
+    var sol = ArrayList<List<Int>>()
+    if(nums.size<3) return sol
+    nums.sort()
+    for(firstNumberPointer in 0 until nums.size-2){
+        var secondNumberPointer = firstNumberPointer+1
+        var thirdNumberPointer = nums.size-1
+        if(firstNumberPointer>0 && nums[firstNumberPointer]==nums[firstNumberPointer-1]) continue
+        while(secondNumberPointer<thirdNumberPointer){
+            (nums[firstNumberPointer]+nums[secondNumberPointer]+nums[thirdNumberPointer]).let{
+                when{
+                    it == 0 -> {
+                        sol.add(listOf(nums[firstNumberPointer], nums[secondNumberPointer], nums[thirdNumberPointer]))
+                        while(secondNumberPointer<thirdNumberPointer && nums[secondNumberPointer] == nums[secondNumberPointer+1]) secondNumberPointer++
+                        while(secondNumberPointer<thirdNumberPointer && nums[thirdNumberPointer] == nums[thirdNumberPointer-1]) thirdNumberPointer--
+                        secondNumberPointer++
+                        thirdNumberPointer--
+                    }
+                    it > 0  -> {
+                        while(secondNumberPointer<thirdNumberPointer && nums[thirdNumberPointer] == nums[thirdNumberPointer-1]) thirdNumberPointer--
+                        thirdNumberPointer--
+                    }
+                    else ->{
+                        while(secondNumberPointer<thirdNumberPointer && nums[secondNumberPointer] == nums[secondNumberPointer+1]) secondNumberPointer++
+                        secondNumberPointer++
+                    }
+                }
+            }
+        }
+    }
+    return sol
+}
+
+//On^2 but space complexity is O2n
+fun threeSumOn2(nums: IntArray): List<List<Int>> {
 
     var sol = ArrayList<List<Int>>()
     if(nums.size<3) return sol
