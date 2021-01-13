@@ -1,10 +1,10 @@
-package algoexpert.easy
+package algoproblems.easy
 
 /**
  *
  * @author Prikshit
  *
- * https://www.algoexpert.io/questions/Find%20Three%20Largest%20Numbers
+ * Find Three Largest Numbers
  *
  * */
 

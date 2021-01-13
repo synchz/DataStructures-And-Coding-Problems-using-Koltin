@@ -1,10 +1,10 @@
-package algoexpert.easy
+package algoproblems.easy
 
 /**
  *
  * @author Prikshit
  *
- * https://www.algoexpert.io/questions/Find%20Closest%20Value%20In%20BST
+ * Find Closest Value In BST
  *
  * */
 open class BST(value: Int) {

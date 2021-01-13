@@ -1,10 +1,10 @@
-package algoexpert.easy
+package algoproblems.easy
 
 /**
  *
  * @author Prikshit
  *
- * https://www.algoexpert.io/questions/Depth-first%20Search
+ * Depth-first Search
  *
  * */
 
