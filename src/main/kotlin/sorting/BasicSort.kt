@@ -17,15 +17,9 @@ fun main(){
 
 fun bubbleSort(arr: Array<Int>){
     var sizeCount = arr.size
-    while(sizeCount>1){
-        for(i in 1 until sizeCount--){
-            if(arr[i-1]>arr[i]) {
-                var t  = arr[i]
-                arr[i] = arr[i-1]
-                arr[i-1] = t
-            }
-        }
-    }
+    while(sizeCount>1)
+        for(i in 1 until sizeCount--)
+            if(arr[i-1]>arr[i]) arr[i] = arr[i-1].also{arr[i-1] = arr[i]}
 }
 
 fun selectionSort(arr: Array<Int>){
