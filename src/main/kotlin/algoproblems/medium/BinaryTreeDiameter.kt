@@ -9,7 +9,6 @@ package algoproblems.medium
  * */
 
 fun main(){
-
     val root = BinaryTree(1)
     root.left = BinaryTree(3)
     root.left!!.left = BinaryTree(7)
@@ -38,3 +37,4 @@ fun binaryTreeDiameter(tree: BinaryTree?): Int {
     dfs(tree)
     return max
 }
+

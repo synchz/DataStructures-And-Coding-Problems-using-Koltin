@@ -12,6 +12,7 @@ package algoproblems.easy
 //Space O(1)
 fun `twoNumberSumNLogN`(array: MutableList<Int>, targetSum: Int): List<Int> {
     var sol = ArrayList<Int>()
+    sol.isNotEmpty()
     if(array.size<2) return sol
     array.sort()
     var i = 0
